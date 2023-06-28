@@ -17,6 +17,35 @@ func main(){
 	//업그레이더 정의. http 연결을 받고 websocket으로 업그레이드 하는 기능을 가진 개체
 	var upgrader = websocket.Upgraders{}
 
+	http.HandleFunc("/ws", handleConnections)
+	go handleMessages()
+
+}
+
+//handleConnections 구현 (연결 핸들러)
+//GET 요청을 websocket으로 업그레이드
+//받은 요청을 클라이언트로 등록 -> websocket에서 메시지를 기다리고
+//받으면 broadcast 채널에 보내는 방식
+
+func handleConnections(w http.ResponseWriter, r *http.Request){
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	defer ws.Close()
+	clients[ws] = true
+
+	for{
+		var msg Message
+		err := ws.ReadJSON(&msg)
+	}
+	if err != nil{
+		log.Printf("error: %v", err)
+		delete(clients, ws)
+		break
+	}
+	broadcast <- msg	
 }
 
 type Message struct {
