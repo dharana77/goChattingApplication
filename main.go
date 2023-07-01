@@ -22,7 +22,7 @@ type Message struct {
 
 func main(){
 	//채팅 서버의 메인이 되는 변수
-	fs := http.FileServer(http.Dir("./public"))
+	fs := http.FileServer(http.Dir("./front"))
 	http.Handle("/", fs)
 	
 	http.HandleFunc("/ws", handleConnections)
